@@ -58,7 +58,8 @@ jobs:
     - name: Archive for release
       run: |
         mkdir artifacts
-        cp -a libssh2/bin artifacts/
+        cp -a libssh2/bin/src/libssh2.* artifacts/
+        rm artifacts/libssh2.pc
         zip -r libssh2-${{ matrix.variant.platform }}.zip artifacts
 
     - name: Updload library
