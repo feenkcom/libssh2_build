@@ -50,19 +50,17 @@ jobs:
         OPENSSL_DIR: ${GITHUB_WORKSPACE}/openssl-1.1.1g
       run: |
         cd libssh2
-        mkdir bin
-        cd bin
-        cmake -DBUILD_SHARED_LIBS=ON ..
+        mkdir build
+        cd build
+        cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=../libssh2 ..
         cmake --build .
+        cmake --install .
 
     - name: Archive for release
       run: |
-        cd libssh2/bin/src
-        zip -r ${GITHUB_WORKSPACE}/libssh2-dev-${{ matrix.variant.platform }}.zip .
-        cd ${GITHUB_WORKSPACE}
+        zip -r ${GITHUB_WORKSPACE}/libssh2-dev-${{ matrix.variant.platform }}.zip libssh2
         mkdir artifacts
-        cp -a libssh2/bin/src/libssh2.* artifacts/
-        rm artifacts/libssh2.pc
+        cp -a libssh2/libssh2/lib/libssh2.* artifacts/
         zip -rj libssh2-${{ matrix.variant.platform }}.zip artifacts
 
     - name: Updload library
