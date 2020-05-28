@@ -1,0 +1,94 @@
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+        - master
+        - akg
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build Unixes
+    runs-on: ${{ matrix.variant.os }}
+    strategy:
+      matrix:
+        variant:
+          - os: ubuntu-18.04
+            platform: linux
+          - os: macos-latest
+            platform: mac
+
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    # Retrieve libssh2 source
+    - name: Retrieve openssh2
+      run: git clone https://github.com/libssh2/libssh2.git -b libssh2-1.9.0
+
+    - name: Retrieve openssl libraries (ubuntu)
+      if: matrix.variant.platform == 'linux'
+      run: |
+        wget https://github.com/feenkcom/libssl_build/releases/download/v1.1.1g-ubuntu-18.04/libssl-dev-ubuntu-18.04.zip
+        unzip libssl-dev-ubuntu-18.04.zip
+
+    - name: Retrieve openssl libraries (mac)
+      if: matrix.variant.platform == 'mac'
+      run: |
+        wget https://github.com/feenkcom/libssl_build/releases/download/v1.1.1g-macos-latest/libssl-dev-macos-latest.zip
+        unzip libssl-dev-macos-latest.zip
+
+
+    - name: Compile
+      env:
+        OPENSSL_ROOT_DIR: ${GITHUB_WORKSPACE}/openssl-1.1.1g
+        OPENSSL_LIB_DIR: ${GITHUB_WORKSPACE}/openssl-1.1.1g
+        OPENSSL_DIR: ${GITHUB_WORKSPACE}/openssl-1.1.1g
+      run: |
+        cd libssh2
+        mkdir bin
+        cd bin
+        cmake -DBUILD_SHARED_LIBS=ON ..
+        cmake -build .
+
+    - name: Archive for release
+      run: |
+        mkdir artifacts
+        cp bin/src/libssh.* artifacts/
+        rm artifacts/libssh2.pc
+        zip -j libssh2-${{ matrix.variant.platform }}.zip artifacts/*
+
+    - name: Updload library
+      uses: actions/upload-artifact@v2
+      with:
+        name: libssh2-${{ matrix.variant.platform }}
+        path: artifacts
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v.1.9.0-${{ matrix.variant.platform }}
+        release_name: v1.9.0-${{ matrix.variant.platform }}
+        body: |
+          libssh2 library for Pharo VM
+        draft: true
+        prerelease: true
+
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./libssh2-${{ matrix.variant.platform }}.zip
+        asset_name: libssh2-${{ matrix.variant.platform }}.zip
+        asset_content_type: application/zip
+
