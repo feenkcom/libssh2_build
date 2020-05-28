@@ -58,7 +58,9 @@ jobs:
 
     - name: Archive for release
       run: |
+        cd libssh2
         zip -r ${GITHUB_WORKSPACE}/libssh2-dev-${{ matrix.variant.platform }}.zip libssh2
+        cd ..
         mkdir artifacts
         cp -a libssh2/libssh2/lib/libssh2.* artifacts/
         zip -rj libssh2-${{ matrix.variant.platform }}.zip artifacts
