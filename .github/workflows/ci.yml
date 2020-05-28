@@ -60,7 +60,9 @@ jobs:
         mkdir artifacts
         cp libssh2/bin/src/libssh2.* artifacts/
         rm artifacts/libssh2.pc
-        zip -j libssh2-${{ matrix.variant.platform }}.zip artifacts/*
+        cd artifacts
+        ls
+        zip ../libssh2-${{ matrix.variant.platform }}.zip *
 
     - name: Updload library
       uses: actions/upload-artifact@v2
