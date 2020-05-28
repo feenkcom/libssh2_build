@@ -58,7 +58,7 @@ jobs:
     - name: Archive for release
       run: |
         mkdir artifacts
-        cp libssh2/bin/src/libssh.* artifacts/
+        cp libssh2/bin/src/libssh2.* artifacts/
         rm artifacts/libssh2.pc
         zip -j libssh2-${{ matrix.variant.platform }}.zip artifacts/*
 
