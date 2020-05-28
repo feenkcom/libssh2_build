@@ -57,6 +57,9 @@ jobs:
 
     - name: Archive for release
       run: |
+        cd libssh2/bin/src
+        zip -r ${GITHUB_WORKSPACE}/libssh2-dev-${{ matrix.variant.platform }}.zip .
+        cd ${GITHUB_WORKSPACE}
         mkdir artifacts
         cp -a libssh2/bin/src/libssh2.* artifacts/
         rm artifacts/libssh2.pc
@@ -90,5 +93,16 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./libssh2-${{ matrix.variant.platform }}.zip
         asset_name: libssh2-${{ matrix.variant.platform }}.zip
+        asset_content_type: application/zip
+
+    - name: Upload -dev Release Asset
+      id: upload-dev-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./libssh2-dev-${{ matrix.variant.platform }}.zip
+        asset_name: libssh2-dev-${{ matrix.variant.platform }}.zip
         asset_content_type: application/zip
 
