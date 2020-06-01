@@ -49,10 +49,16 @@ jobs:
     - name: Set pkg path
       run: echo ::set-env name=PKG_CONFIG_PATH::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/lib/pkgconfig")
 
+    - name: Check pkg path
+      run: |
+        pkg-config --modversion openssl
+        pkg-config --libs openssl
+
     - name: Set OPENSSL env vars
       run: |
         echo ::set-env name=OPENSSL_ROOT_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release")
         echo ::set-env name=OPENSSL_LIB_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/lib")
+        echo ::set-env name=OPENSSL_INCLUDE_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/include")
         echo ::set-env name=OPENSSL_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release")
 
     - name: Configure
