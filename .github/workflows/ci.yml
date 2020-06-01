@@ -47,13 +47,22 @@ jobs:
         unzip libssl-dev-macos-latest.zip
 
     - name: Set pkg path
-      run: echo ::set-env name=PKG_CONFIG_PATH::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/lib/pkgconfig")
+      run: echo ::set-env name=PKG_CONFIG_PATH::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/lib/pkgconfig")
+
+    - name: Set OPENSSL env vars
+      run: |
+        echo ::set-env name=OPENSSL_ROOT_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release")
+        echo ::set-env name=OPENSSL_LIB_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/lib")
+        echo ::set-env name=OPENSSL_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release")
 
     - name: Configure
       run: |
         cd libssh2
         mkdir build
         cd build
+        echo "OPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}"
+        echo "OPENSSL_LIB_DIR=${OPENSSL_LIB_DIR}"
+        echo "OPENSSL_DIR=${OPENSSL_DIR}"
         cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=../libssh2 ..
 
     - name: Compile
