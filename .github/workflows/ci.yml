@@ -47,7 +47,7 @@ jobs:
         unzip libssl-dev-macos-latest.zip
 
     - name: Set pkg path
-      run: echo ::set-env name=PKG_CONFIG_PATH::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/lib/pkgconfig")
+      run: echo ::set-env name=PKG_CONFIG_PATH::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/lib/pkgconfig")
 
     - name: Check pkg path
       run: |
@@ -58,10 +58,10 @@ jobs:
 
     - name: Set OPENSSL env vars
       run: |
-        echo ::set-env name=OPENSSL_ROOT_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release")
-        echo ::set-env name=OPENSSL_LIB_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/lib")
-        echo ::set-env name=OPENSSL_INCLUDE_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release/include")
-        echo ::set-env name=OPENSSL_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/release")
+        echo ::set-env name=OPENSSL_ROOT_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g")
+        echo ::set-env name=OPENSSL_LIB_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/lib")
+        echo ::set-env name=OPENSSL_INCLUDE_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/include")
+        echo ::set-env name=OPENSSL_DIR::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g")
 
     - name: Configure
       run: |
