@@ -23,6 +23,10 @@ jobs:
             platform: mac
 
     steps:
+    - name: Install dependencies
+      if: matrix.variant.os == 'macos-latest'
+      run: brew install pkg-config
+
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
@@ -42,18 +46,24 @@ jobs:
         wget https://github.com/feenkcom/libssl_build/releases/download/v1.1.1g-macos-latest/libssl-dev-macos-latest.zip
         unzip libssl-dev-macos-latest.zip
 
+    - name: Set pkg path
+      run: echo ::set-env name=PKG_CONFIG_PATH::$(echo "${GITHUB_WORKSPACE}/openssl-1.1.1g/lib/pkgconfig")
 
-    - name: Compile
-      env:
-        OPENSSL_ROOT_DIR: ${GITHUB_WORKSPACE}/openssl-1.1.1g
-        OPENSSL_LIB_DIR: ${GITHUB_WORKSPACE}/openssl-1.1.1g
-        OPENSSL_DIR: ${GITHUB_WORKSPACE}/openssl-1.1.1g
+    - name: Configure
       run: |
         cd libssh2
         mkdir build
         cd build
         cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=../libssh2 ..
+
+    - name: Compile
+      run: |
+        cd libssh2/build
         cmake --build .
+
+    - name: Install
+      run: |
+        cd libssh2/build
         cmake --install .
 
     - name: Archive for release
@@ -62,7 +72,7 @@ jobs:
         zip -r ${GITHUB_WORKSPACE}/libssh2-dev-${{ matrix.variant.platform }}.zip libssh2
         cd ..
         mkdir artifacts
-        cp -a libssh2/libssh2/lib/libssh2.* artifacts/
+        cp libssh2/libssh2/lib/libssh2.* artifacts/
         zip -rj libssh2-${{ matrix.variant.platform }}.zip artifacts
 
     - name: Updload library
