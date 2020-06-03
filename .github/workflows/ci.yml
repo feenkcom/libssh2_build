@@ -82,14 +82,21 @@ jobs:
         cd libssh2/build
         cmake --install .
 
+    - name: Mac id correction
+      if: matrix.variant.platform == 'mac'
+      run: |
+        cd libssh2/build/src
+        for i in libssh2.*dylib*; do install_name_tool -id @executable_path/Plugins/$i $i; done
+        otool -L libssl.*dylib*
+
     - name: Archive for release
       run: |
         cd libssh2
-        zip -r ${GITHUB_WORKSPACE}/libssh2-dev-${{ matrix.variant.platform }}.zip libssh2
+        zip -ry ${GITHUB_WORKSPACE}/libssh2-dev-${{ matrix.variant.platform }}.zip libssh2
         cd ..
         mkdir artifacts
         cp libssh2/libssh2/lib/libssh2.* artifacts/
-        zip -rj libssh2-${{ matrix.variant.platform }}.zip artifacts
+        zip -rjy libssh2-${{ matrix.variant.platform }}.zip artifacts
 
     - name: Updload library
       uses: actions/upload-artifact@v2
@@ -107,7 +114,7 @@ jobs:
         release_name: v1.9.0-${{ matrix.variant.platform }}
         body: |
           libssh2 library for Pharo VM
-        draft: true
+        draft: false
         prerelease: true
 
     - name: Upload Release Asset
