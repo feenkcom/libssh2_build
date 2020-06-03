@@ -87,7 +87,7 @@ jobs:
       run: |
         cd libssh2/build/src
         for i in libssh2.*dylib*; do install_name_tool -id @executable_path/Plugins/$i $i; done
-        otool -L libssl.*dylib*
+        otool -L libssh2.*dylib*
 
     - name: Archive for release
       run: |
